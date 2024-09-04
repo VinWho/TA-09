@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Jadwal Seminar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            margin: 5px 0;
+        }
+        a {
+            text-decoration: none;
+        }
+        .btn {
+            display: inline-block;
+            margin: 10px 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #007bff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const englishToIndonesianDays = {
+                'Monday': 'Senin',
+                'Tuesday': 'Selasa',
+                'Wednesday': 'Rabu',
+                'Thursday': 'Kamis',
+                'Friday': 'Jumat',
+                'Saturday': 'Sabtu',
+                'Sunday': 'Minggu'
+            };
+
+            // Replace days in table
+            document.querySelectorAll('td, th').forEach(function(cell) {
+                const text = cell.textContent.trim();
+                if (englishToIndonesianDays[text]) {
+                    cell.textContent = englishToIndonesianDays[text];
+                }
+            });
+
+            // Replace days in conflict details
+            document.querySelectorAll('.conflict-details li').forEach(function(item) {
+                let text = item.textContent.trim();
+                for (const [english, indonesian] of Object.entries(englishToIndonesianDays)) {
+                    if (text.includes(english)) {
+                        text = text.replace(english, indonesian);
+                    }
+                }
+                item.textContent = text;
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Jadwal Seminar</h1>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Kelompok</th>
+                <th>Dosen Penguji 1</th>
+                <th>Dosen Penguji 2</th>
+                <th>Dosen Pembimbing 1</th>
+                <th>Dosen Pembimbing 2</th>
+                <th>Hari</th>
+                <th>Tanggal</th>
+                <th>Waktu Mulai</th>
+                <th>Waktu Selesai</th>
+                <th>Ruangan</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in schedule %}
+            <tr>
+                <td>{{ item.Kelompok }}</td>
+                <td>{{ item.Dosen_Penguji_1 }}</td>
+                <td>{{ item.Dosen_Penguji_2 }}</td>
+                <td>{{ item.Dosen_Pembimbing_1 }}</td>
+                <td>{{ item.Dosen_Pembimbing_2 }}</td>
+                <td>{{ item.Hari }}</td>
+                <td>{{ item.Tanggal }}</td>
+                <td>{{ item['Waktu Mulai'] }}</td>
+                <td>{{ item['Waktu Selesai'] }}</td>
+                <td>{{ item.Ruangan }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Informasi Jadwal</h2>
+    <ul>
+        <li>Best Fitness: {{ best_fitness }}</li>
+        <li>Number of Generations: {{ num_generations }}</li>
+        <li>Population Size: {{ pop_size }}</li>
+        <li>Elapsed Time: {{ elapsed_time }} seconds</li>
+    </ul>
+
+    <h2>Detail Konflik</h2>
+    {% if conflict_details %}
+    <ul class="conflict-details">
+        {% for conflict in conflict_details %}
+        <li>
+            {{ conflict.conflict_type }} antara {{ conflict.kelompok1 }} dan {{ conflict.kelompok2 }}
+            {% if conflict.lecturer %}
+            dengan dosen {{ conflict.lecturer }}
+            {% endif %}
+            pada {{ conflict.details }}
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>Tidak ada bentrokan dalam jadwal.</p>
+    {% endif %}
+
+    <div>
+        <a class="btn" href="/download_schedule">Download Jadwal</a>
+        <a class="btn" href="/">Kembali</a>
+        <a class="btn" href="/fitness_plot">Tampilkan Grafik Fitness</a>
+        <a class="btn" href="/regenerate_schedule">Regenerasi Jadwal</a>
+    </div>
+</body>
+</html>

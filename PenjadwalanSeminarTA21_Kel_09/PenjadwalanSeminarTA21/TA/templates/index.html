@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <title>Genetic Algorithm Seminar Scheduler</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        h2 {
+            color: #2980b9;
+        }
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input[type="file"], input[type="text"], button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0 15px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #3498db;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            background-color: #fff;
+            margin: 5px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        ul li:nth-child(odd) {
+            background-color: #f9f9f9;
+        }
+        .info-section {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .info-section p {
+            margin: 0 0 10px;
+        }
+        .info-section h2 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Genetic Algorithm Seminar Scheduler</h1>
+
+    <h2>Unggah File</h2>
+    <form action="/upload" method="post" enctype="multipart/form-data">
+        <label for="kelompok">Kelompok:</label>
+        <input type="file" id="kelompok" name="kelompok"><br>
+
+        <label for="hari">Hari:</label>
+        <input type="file" id="hari" name="hari"><br>
+
+        <label for="jadwal_dosen">Jadwal Dosen:</label>
+        <input type="file" id="jadwal_dosen" name="jadwal_dosen"><br>
+
+        <label for="jadwal_mahasiswa">Jadwal Mahasiswa:</label>
+        <input type="file" id="jadwal_mahasiswa" name="jadwal_mahasiswa"><br>
+
+        <label for="ruangan">Ruangan:</label>
+        <input type="file" id="ruangan" name="ruangan"><br>
+
+        <label for="tanggal_mulai">Tanggal Mulai:</label>
+        <input type="text" id="tanggal_mulai" name="tanggal_mulai" class="flatpickr"><br>
+        
+        <label for="tanggal_selesai">Tanggal Selesai:</label>
+        <input type="text" id="tanggal_selesai" name="tanggal_selesai" class="flatpickr"><br>        
+
+        <button type="submit">Unggah</button>
+    </form>
+
+    {% if schedule %}
+    <h2>Jadwal Seminar</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Kelompok</th>
+                <th>Dosen Penguji 1</th>
+                <th>Dosen Penguji 2</th>
+                <th>Dosen Pembimbing 1</th>
+                <th>Dosen Pembimbing 2</th>
+                <th>Hari</th>
+                <th>Tanggal</th>
+                <th>Waktu</th>  
+                <th>Ruangan</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in schedule %}
+            <tr>
+                <td>{{ item.Kelompok }}</td>
+                <td>{{ item.Dosen_Penguji_1 }}</td>
+                <td>{{ item.Dosen_Penguji_2 }}</td>
+                <td>{{ item.Dosen_Pembimbing_1 }}</td>
+                <td>{{ item.Dosen_Pembimbing_2 }}</td>
+                <td>{{ item.Hari }}</td>
+                <td>{{ item.Tanggal }}</td>
+                <td>{{ item.Waktu }}</td>  
+                <td>{{ item.Ruangan }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>    
+
+    <div class="info-section">
+        <h2>Informasi Jadwal</h2>
+        <p><strong>Best Accuracy:</strong> {{ best_accuracy }}%</p>
+        <p><strong>Best Fitness:</strong> {{ best_fitness }}</p>
+        <p><strong>Number of Generations:</strong> {{ num_generations }}</p>
+        <p><strong>Elapsed Time:</strong> {{ elapsed_time | round(2) }} seconds</p>
+    </div>
+
+
+    {% if conflicts %}
+    <h2>Hasil Pengecekan Jadwal</h2>
+    <ul>
+        {% for conflict in conflicts %}
+        <li>{{ conflict.conflict_type }}: {{ conflict.details }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}    
+    
+    <h2>Download Jadwal</h2>
+    <form action="{{ url_for('download_schedule') }}" method="get">
+        <button type="submit">Download Jadwal</button>
+    </form>
+
+    <h2>Plot Fitness</h2>
+    <form action="{{ url_for('plot_fitness') }}" method="get">
+        <button type="submit">Tampilkan Plot Fitness</button>
+    </form>
+
+    <form action="{{ url_for('generate_new_schedule') }}" method="get">
+        <button type="submit">Generate Jadwal Lagi</button>
+    </form>    
+    {% endif %}
+</body>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/id.js"></script> <!-- Include Indonesian locale -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            flatpickr(".flatpickr", {
+                dateFormat: "Y-m-d",
+                locale: "id"  // Set the locale to Indonesian
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const daysOfWeek = {
+                'Monday': 'Senin',
+                'Tuesday': 'Selasa',
+                'Wednesday': 'Rabu',
+                'Thursday': 'Kamis',
+                'Friday': 'Jumat',
+                'Saturday': 'Sabtu',
+                'Sunday': 'Minggu'
+            };
+
+            const table = document.querySelector('table');
+            if (table) {
+                const rows = table.querySelectorAll('tbody tr');
+                rows.forEach(row => {
+                    const dayCell = row.querySelector('td:nth-child(6)'); 
+                    if (dayCell) {
+                        const dayText = dayCell.textContent.trim();
+                        dayCell.textContent = daysOfWeek[dayText] || dayText;
+                    }
+                });
+            }
+        });
+    </script>
+
+</html>
